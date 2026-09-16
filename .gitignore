@@ -1,0 +1,4 @@
+.markdash/cache/
+.markdash/dist/
+node_modules/
+.DS_Store

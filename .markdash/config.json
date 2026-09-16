@@ -1,0 +1,11 @@
+{
+  "docsDir": "docs",
+  "cacheDir": ".markdash/cache",
+  "include": ["**/*.md"],
+  "exclude": ["archive/**", "guide/**"],
+  "staleDays": 14,
+  "taskStatuses": ["backlog", "todo", "in_progress", "blocked", "review", "done", "cancelled"],
+  "decisionStatuses": ["proposed", "accepted", "deprecated", "superseded"],
+  "riskStatuses": ["open", "mitigated", "closed"],
+  "testStatuses": ["planned", "passing", "failing", "skipped"]
+}

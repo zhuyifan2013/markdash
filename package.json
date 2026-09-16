@@ -1,0 +1,41 @@
+{
+  "name": "markdash",
+  "version": "0.1.0",
+  "description": "Markdown-driven, AI-agent-friendly project dashboard",
+  "keywords": [
+    "markdown",
+    "dashboard",
+    "project-management",
+    "ai-agents",
+    "documentation",
+    "adr",
+    "claude",
+    "cursor",
+    "codex"
+  ],
+  "bin": {
+    "markdash": "bin/markdash.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "web",
+    "assets",
+    "skill",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zhuyifan2013/markdash.git"
+  },
+  "homepage": "https://github.com/zhuyifan2013/markdash#readme",
+  "bugs": {
+    "url": "https://github.com/zhuyifan2013/markdash/issues"
+  },
+  "private": false
+}
