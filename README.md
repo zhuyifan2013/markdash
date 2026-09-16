@@ -133,7 +133,8 @@ either serves a live dashboard or builds a static one.
 
 The pipeline is `scan -> parse -> validate -> aggregate -> serve / build`:
 
-- **Authors** — AI agents (guided by the Codex skill and `AGENTS.md`), humans, and Git all work on the same Markdown.
+- **Authors** — AI agents, humans, and Git all work on the same Markdown.
+- **Guidance** — the Codex skill, a root `AGENTS.md` router, and `docs/guide/` tell agents what to read and when to update; `validate` gates every change.
 - **Source of truth** — `docs/**/*.md`: typed documents with queryable frontmatter plus a document index and agent guides.
 - **Engine** — the dependency-free `markdash` CLI handles scanning, frontmatter parsing, validation, and aggregation.
 - **Projection** — generated-only outputs: the live dashboard (`:4147`, SSE hot reload) or a static build for GitHub Pages / Vercel.
@@ -156,21 +157,57 @@ templates/                Document templates
 This repository uses Markdash to manage itself, so `docs/` is also a working
 end-to-end example.
 
-## AI agent workflow
+## AI agent skill
 
-The included Codex skill (in `skill/markdash/`) instructs agents to:
+Markdash ships with an installable [Codex](https://developers.openai.com/codex/)
+skill that teaches agents how to keep project documents current as they work, so
+documentation updates become part of the task rather than an afterthought. It is
+a key part of the architecture — the *Guidance* layer that tells agents what and
+when to write.
 
-1. Read `docs/index.md` first and only the relevant linked documents.
-2. Classify work before finishing: progress / decision / risk / test / operations
-   change, stale doc found, or no-knowledge-change.
-3. Update the corresponding Markdown file and `updated_at` for everything except
-   `no-knowledge-change`, then run `markdash validate`.
+### Install
+
+Copy the skill into your Codex skills directory (or clone and symlink it):
+
+```bash
+cp -R skill/markdash ~/.codex/skills/markdash
+```
+
+A new session then makes the skill available automatically. The CLI itself has no
+dependency on the skill; the skill only governs agent behavior.
+
+### Layout and progressive disclosure
+
+```text
+skill/markdash/
+├── SKILL.md                    # Entry point: shared workflow, always relevant
+└── references/
+    ├── metadata.md             # Frontmatter fields, enums, examples
+    └── workflow.md             # Event -> document map, what not to document
+```
+
+Agents load the short `SKILL.md` when the skill applies, and read a reference
+only when the current task needs it (writing frontmatter, or deciding what to
+record). Project rules under `docs/guide/` take precedence over skill defaults.
+
+### What the skill enforces
+
+1. Read `docs/index.md` first, then only the linked documents relevant to the
+   task — never scan the whole repository.
+2. Before finishing, classify the work: progress / decision / risk / test /
+   operations change, stale document found, or **no-knowledge-change**.
+3. For every class except `no-knowledge-change`, update the matching Markdown
+   file and its `updated_at`, then run `markdash validate`.
 
 Decision rule for agents:
 
 > If the next agent could not continue, verify results, or troubleshoot using
 > only code and docs — without reading this chat — update the document.
 > Otherwise, stay silent and do not create documentation noise.
+
+The same behavior works for other AI tools via `AGENTS.md` (a short router in
+the repo root) and the versioned rules in `docs/guide/`; auto-loading rule
+generation for Cursor, Claude Code, and GitHub Copilot is on the roadmap.
 
 ## Local development
 

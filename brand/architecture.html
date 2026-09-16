@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/><style>
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:1280px;height:980px;}
+  html,body{width:1280px;height:1230px;}
   body{
     background:radial-gradient(120% 120% at 10% 0%,#161c2c 0%,#0a0c12 55%,#06070b 100%);
     font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
@@ -64,6 +64,19 @@
       <div class="card"><div class="k"><span class="dot blue"></span>AI agent</div><div class="v">Follows the Codex skill + <span class="cmd">AGENTS.md</span>; updates task/decision/risk/test files during work and runs <span class="cmd">markdash validate</span>.</div></div>
       <div class="card"><div class="k"><span class="dot purple"></span>Human</div><div class="v">Edits Markdown in any editor, or (planned) uses dashboard quick actions that write back to frontmatter.</div></div>
       <div class="card"><div class="k"><span class="dot green"></span>Git</div><div class="v">Every change is diffable, reviewable, and versioned — no separate database to reconcile.</div></div>
+    </div>
+  </div>
+
+  <div class="flow"><span>&#8635;</span><b>skill + rules tell the agent what / when to write &#183; validate gates it</b></div>
+
+  <!-- Layer 1b: guidance -->
+  <div class="layer">
+    <div class="layer-tag" style="background:linear-gradient(90deg,#6ea8fe,#7cd0ff);color:#0a0c12;">Guidance</div>
+    <div class="layer-head"><div class="layer-title">How agents know what to do</div><div class="layer-note">Loaded progressively, not all at once</div></div>
+    <div class="cards">
+      <div class="card"><div class="k"><span class="dot blue"></span>Codex skill</div><div class="v"><span class="cmd">skill/markdash/SKILL.md</span> defines the workflow and finish-time update checklist; references loaded only when needed.</div></div>
+      <div class="card"><div class="k"><span class="dot purple"></span>AGENTS.md</div><div class="v">Short router + always-on rules in the repo root; points agents to the index and guides.</div></div>
+      <div class="card"><div class="k"><span class="dot green"></span>docs/guide/</div><div class="v">Project-versioned rules: agent workflow, documentation policy, frontmatter schema.</div></div>
     </div>
   </div>
 
