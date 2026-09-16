@@ -32,13 +32,40 @@ It is designed around two readers at once:
 
 Requirements: Node.js 18 or newer.
 
-```bash
-npm install -g markdash   # or use npx markdash <command> once published
+The package is not published to npm yet, so use one of the following instead of
+`npm install -g markdash`.
 
-cd your-project
-markdash init       # scaffold docs/, guides, templates, and AGENTS.md
-markdash serve      # open http://localhost:4147
+**Option 1 - clone and link (recommended for local development)**
+
+```bash
+git clone https://github.com/zhuyifan2013/markdash.git
+cd markdash
+npm link        # makes the global `markdash` command point at this checkout
+
+cd ../your-project
+markdash init
+markdash serve  # http://localhost:4147
 ```
+
+**Option 2 - run directly from a clone (no global command)**
+
+```bash
+git clone https://github.com/zhuyifan2013/markdash.git
+node /path/to/markdash/bin/markdash.js init
+node /path/to/markdash/bin/markdash.js serve
+```
+
+You can add an alias or a `package.json` script, e.g.
+`"dashboard": "node /path/to/markdash/bin/markdash.js serve"`.
+
+**Option 3 - vendor the CLI into your own repository**
+
+Copy `bin/`, `src/`, `web/`, and `assets/` into your project (for example
+under `tools/markdash/`) and run `node tools/markdash/bin/markdash.js serve`.
+This keeps the dashboard reproducible without depending on a published package.
+
+> Publishing to npm (so `npm install -g markdash` / `npx markdash` works) is
+> tracked as a future task; see `docs/tasks/npm-publish.md`.
 
 During development, run validation after editing documents:
 
