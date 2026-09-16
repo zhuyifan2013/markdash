@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo.png" width="140" alt="Markdash logo" />
+</p>
+
 # Markdash
 
 > A Markdown-driven, AI-agent-friendly project dashboard.
@@ -115,6 +119,24 @@ Four distinct dimensions, never conflated:
 See [docs/guide/metadata-schema.md](docs/guide/metadata-schema.md) for the full
 schema and [docs/guide/documentation-policy.md](docs/guide/documentation-policy.md)
 for the update policy.
+
+## Architecture
+
+Markdown is the single source of truth, frontmatter is structured state, and
+the dashboard is a read-only projection. Humans and AI agents edit the same
+`docs/` files; the zero-dependency Node CLI scans, validates, aggregates, and
+either serves a live dashboard or builds a static one.
+
+<p align="center">
+  <img src="docs/assets/architecture.png" alt="Markdash architecture" width="900" />
+</p>
+
+The pipeline is `scan -> parse -> validate -> aggregate -> serve / build`:
+
+- **Authors** — AI agents (guided by the Codex skill and `AGENTS.md`), humans, and Git all work on the same Markdown.
+- **Source of truth** — `docs/**/*.md`: typed documents with queryable frontmatter plus a document index and agent guides.
+- **Engine** — the dependency-free `markdash` CLI handles scanning, frontmatter parsing, validation, and aggregation.
+- **Projection** — generated-only outputs: the live dashboard (`:4147`, SSE hot reload) or a static build for GitHub Pages / Vercel.
 
 ## Repository layout
 

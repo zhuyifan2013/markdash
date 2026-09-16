@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1280px;height:980px;}
+  body{
+    background:radial-gradient(120% 120% at 10% 0%,#161c2c 0%,#0a0c12 55%,#06070b 100%);
+    font-family:-apple-system,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;
+    color:#e6e8ec;padding:46px 52px;position:relative;overflow:hidden;}
+  body::before{content:"";position:absolute;width:420px;height:420px;left:-120px;top:-120px;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%,rgba(110,168,254,.5),transparent 70%);filter:blur(40px);}
+  body::after{content:"";position:absolute;width:440px;height:440px;right:-140px;bottom:-140px;border-radius:50%;
+    background:radial-gradient(circle at 45% 45%,rgba(169,139,255,.5),transparent 70%);filter:blur(46px);}
+  .wrap{position:relative;z-index:2;}
+  .head{display:flex;align-items:center;gap:16px;margin-bottom:6px;}
+  .mark{width:46px;height:46px;border-radius:13px;flex-shrink:0;
+    background:linear-gradient(155deg,rgba(255,255,255,.32),rgba(255,255,255,.07));
+    border:1px solid rgba(255,255,255,.4);display:flex;align-items:flex-end;justify-content:center;gap:4px;padding-bottom:9px;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.7),0 10px 22px rgba(0,0,0,.45);}
+  .mark i{width:6px;border-radius:3px;background:#fff;}
+  .mark i:nth-child(1){height:12px;}.mark i:nth-child(2){height:19px;}.mark i:nth-child(3){height:26px;}
+  h1{font-size:27px;font-weight:700;letter-spacing:.2px;}
+  .sub{color:#8b93a3;font-size:14px;margin:2px 0 26px 62px;}
+
+  .layer{position:relative;background:rgba(23,26,33,.72);border:1px solid #2a2f3a;border-radius:18px;
+    padding:18px 20px;margin-bottom:14px;
+    -webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 14px 30px rgba(0,0,0,.35);}
+  .layer-tag{position:absolute;top:-11px;left:18px;font-size:11px;font-weight:700;letter-spacing:1px;
+    color:#0a0c12;background:linear-gradient(90deg,#6ea8fe,#a98bff);padding:3px 11px;border-radius:99px;text-transform:uppercase;}
+  .layer-head{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 12px;}
+  .layer-title{font-size:16px;font-weight:600;}
+  .layer-note{font-size:12px;color:#8b93a3;}
+  .cards{display:flex;gap:12px;}
+  .card{flex:1;background:rgba(30,34,43,.85);border:1px solid #2a2f3a;border-radius:13px;padding:13px 15px;}
+  .card .k{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .card .v{font-size:12px;color:#8b93a3;line-height:1.55;}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .blue{background:#6ea8fe;}.purple{background:#a98bff;}.green{background:#3fb97a;}.red{background:#e0625d;}.yellow{background:#d8a83e;}
+
+  .flow{display:flex;align-items:center;justify-content:center;gap:10px;margin:-4px 0 12px;}
+  .flow span{color:#6ea8fe;font-size:20px;}
+  .flow b{font-size:11px;color:#8b93a3;font-weight:500;letter-spacing:.5px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .pill{font-size:11px;color:#aeb6c6;border:1px solid #343a47;border-radius:99px;padding:3px 10px;background:rgba(255,255,255,.03);}
+  .cmd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#9ec1ff;}
+  .legend{display:flex;gap:20px;justify-content:center;margin-top:6px;font-size:12px;color:#8b93a3;}
+  .legend span{display:flex;align-items:center;gap:6px;}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="mark"><i></i><i></i><i></i></div>
+    <h1>Markdash — architecture</h1>
+  </div>
+  <div class="sub">Markdown is the single source of truth · frontmatter is structured state · the dashboard is a live projection</div>
+
+  <!-- Layer 1: authors -->
+  <div class="layer">
+    <div class="layer-tag">Authors</div>
+    <div class="layer-head"><div class="layer-title">Who writes the state</div><div class="layer-note">Both humans and agents edit the same files</div></div>
+    <div class="cards">
+      <div class="card"><div class="k"><span class="dot blue"></span>AI agent</div><div class="v">Follows the Codex skill + <span class="cmd">AGENTS.md</span>; updates task/decision/risk/test files during work and runs <span class="cmd">markdash validate</span>.</div></div>
+      <div class="card"><div class="k"><span class="dot purple"></span>Human</div><div class="v">Edits Markdown in any editor, or (planned) uses dashboard quick actions that write back to frontmatter.</div></div>
+      <div class="card"><div class="k"><span class="dot green"></span>Git</div><div class="v">Every change is diffable, reviewable, and versioned — no separate database to reconcile.</div></div>
+    </div>
+  </div>
+
+  <div class="flow"><span>↑ write</span><b>docs/**/*.md</b><span>↓ watch</span></div>
+
+  <!-- Layer 2: source of truth -->
+  <div class="layer">
+    <div class="layer-tag" style="background:linear-gradient(90deg,#3fb97a,#4fd6a3);">Source of truth</div>
+    <div class="layer-head"><div class="layer-title">docs/ — Markdown + frontmatter</div><div class="layer-note">Body = context · YAML frontmatter = queryable state</div></div>
+    <div class="cards">
+      <div class="card"><div class="k">Typed documents</div><div class="v">project · task · decision · risk · test · note · doc</div></div>
+      <div class="card"><div class="k">Structured fields</div><div class="v">id, type, status, priority, owner, due, tags, related, updated_at…</div></div>
+      <div class="card"><div class="k">Guides &amp; index</div><div class="v"><span class="cmd">docs/index.md</span> map + <span class="cmd">docs/guide/</span> rules for agents</div></div>
+    </div>
+  </div>
+
+  <!-- Layer 3: CLI -->
+  <div class="layer">
+    <div class="layer-tag" style="background:linear-gradient(90deg,#d8a83e,#f0c969);color:#1a1a1a;">Engine — zero-dependency Node CLI</div>
+    <div class="layer-head"><div class="layer-title">markdash (Node built-ins only)</div><div class="layer-note">scan → parse → validate → aggregate → serve / build</div></div>
+    <div class="cards">
+      <div class="card"><div class="k"><span class="dot yellow"></span>Scanner &amp; parser</div><div class="v">Recursive <span class="cmd">docs/</span> scan; minimal YAML frontmatter parser (scalars + inline lists).</div></div>
+      <div class="card"><div class="k"><span class="dot red"></span>Validator</div><div class="v">Enums, duplicate ids, broken <span class="cmd">related</span> links, blocked/done invariants.</div></div>
+      <div class="card"><div class="k"><span class="dot blue"></span>Aggregator</div><div class="v">Board columns, risks, overdue &amp; stale detection, recent updates, health.</div></div>
+      <div class="card"><div class="k"><span class="dot purple"></span>Commands</div><div class="v"><span class="cmd">init · sync · validate · serve · build</span></div></div>
+    </div>
+  </div>
+
+  <!-- Layer 4: outputs -->
+  <div class="layer">
+    <div class="layer-tag" style="background:linear-gradient(90deg,#a98bff,#c3a5ff);color:#1a1a1a;">Projection</div>
+    <div class="layer-head"><div class="layer-title">Generated outputs (never hand-edited)</div></div>
+    <div class="grid2">
+      <div class="card"><div class="k"><span class="dot blue"></span>Live dashboard</div><div class="v"><span class="cmd">markdash serve</span> on :4147 — HTTP API (<span class="cmd">/api/documents</span>) + SSE live reload; file watcher re-scans on save.</div>
+        <div class="pillrow"><span class="pill">Overview</span><span class="pill">Task board</span><span class="pill">Decisions &amp; risks</span><span class="pill">Tests</span><span class="pill">Documents</span></div></div>
+      <div class="card"><div class="k"><span class="dot green"></span>Static artifacts</div><div class="v"><span class="cmd">.markdash/cache/documents.json</span>, generated index block, and <span class="cmd">markdash build</span> → <span class="cmd">.markdash/dist</span> with inlined <span class="cmd">data.json</span> for GitHub Pages / Vercel.</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot blue"></span>agent / live path</span>
+    <span><span class="dot green"></span>generated / static path</span>
+    <span><span class="dot red"></span>validation gates every change</span>
+  </div>
+</div>
+</body></html>

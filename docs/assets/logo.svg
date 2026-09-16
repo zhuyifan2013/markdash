@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="glass" x1="90" y1="90" x2="422" y2="422" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.34"/>
+      <stop offset="0.3" stop-color="#9db4e8" stop-opacity="0.16"/>
+      <stop offset="0.62" stop-color="#5a6a9e" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#b79bff" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="0.7" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="188" x2="0" y2="318" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.82"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="90" y="90" width="332" height="332" rx="80" fill="url(#glass)" stroke="#ffffff" stroke-opacity="0.5"/>
+  <path d="M128 96 h256 a48 48 0 0 1 48 48 v34 q -176 84 -352 0 v-34 a48 48 0 0 1 48 -48 z" fill="url(#sheen)" opacity="0.75"/>
+
+  <g fill="url(#bar)">
+    <rect x="186" y="252" width="36" height="66" rx="12"/>
+    <rect x="238" y="218" width="36" height="100" rx="12"/>
+    <rect x="290" y="186" width="36" height="132" rx="12"/>
+  </g>
+</svg>
