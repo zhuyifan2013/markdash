@@ -1,4 +1,7 @@
-const state = { data: null, view: 'overview', query: '', filters: { priority: '', tag: '' } };
+const state = {
+  data: null, projects: [], workspace: '', view: 'overview', query: '',
+  filters: { priority: '', tag: '' },
+};
 
 const TYPE_META = {
   project:  { label: 'Project',  color: 'var(--yellow)' },
@@ -38,8 +41,15 @@ const TASK_COLUMNS = [
 
 async function loadData() {
   try {
-    const res = await fetch('/api/documents');
-    if (res.ok) { state.data = await res.json(); render(); return; }
+    const query = state.workspace ? `?workspace=${encodeURIComponent(state.workspace)}` : '';
+    const res = await fetch(`/api/documents${query}`);
+    if (res.ok) {
+      state.data = await res.json();
+      state.projects = state.data.projects || [];
+      state.workspace = state.data.selected || '';
+      render();
+      return;
+    }
     throw new Error('api unavailable');
   } catch (_) {
     const staticRes = await fetch('data.json');
@@ -88,7 +98,7 @@ function markdown(md) {
   return html;
 }
 
-function docById(id) { return state.data.documents.find((d) => d.id === id); }
+function docById(id) { return state.data.documents.find((d) => (d.key || d.id) === id); }
 function statusLabel(s) { return STATUS_LABELS[s] || s; }
 
 function alertHtml(a) {
@@ -102,9 +112,13 @@ function itemHtml(d) {
   const type = TYPE_META[d.type] || { label: d.type, color: 'var(--muted)' };
   const pri = PRIORITY_META[d.priority];
   const tags = (d.tags || []).map((t) => `<span class="tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join(' ');
-  return `<div class="item type-${esc(d.type)}" data-id="${esc(d.id)}" style="border-left:3px solid ${type.color}">
+  const workspaceChip = state.projects.length > 1 && !state.workspace
+    ? `<span class="workspace-chip">${esc(d.workspace_name || '')}</span>`
+    : '';
+  return `<div class="item type-${esc(d.type)}" data-id="${esc(d.key || d.id)}" style="border-left:3px solid ${type.color}">
     <div class="item-top">
       <span class="type-chip" style="color:${type.color}">${type.label}</span>
+      ${workspaceChip}
       <span class="status-dot status-${esc(d.status)}"></span>
       <span class="status-text status-${esc(d.status)}">${esc(statusLabel(d.status))}</span>
       ${pri ? `<span class="pri-chip" style="color:${pri.color};border-color:${pri.color}">${pri.label}</span>` : ''}
@@ -120,7 +134,7 @@ function itemHtml(d) {
 
 function matchQuery(d, q) {
   if (!q) return true;
-  return [d.title, d.id, d.owner, d.path, ...(d.tags || [])].join(' ').toLowerCase().includes(q);
+  return [d.title, d.id, d.workspace_name || '', d.owner, d.path, ...(d.tags || [])].join(' ').toLowerCase().includes(q);
 }
 function matchFilters(d) {
   if (state.filters.priority && d.priority !== state.filters.priority) return false;
@@ -151,10 +165,10 @@ const VIEWS = {
     const inProgress = bs.in_progress || 0;
 
     const alerts = [
-      ...s.tasks.blocked.map((x) => ({ doc: docById(x.id), kind: 'Blocked', tone: 'red' })),
-      ...s.tasks.overdue.map((x) => ({ doc: docById(x.id), kind: 'Overdue', tone: 'red' })),
-      ...s.risks.high.map((x) => ({ doc: docById(x.id), kind: 'High risk', tone: 'red' })),
-      ...s.stale.map((x) => ({ doc: docById(x.id), kind: `Stale ${x.age_days}d`, tone: 'yellow' })),
+      ...s.tasks.blocked.map((x) => ({ doc: docById(x.key || x.id), kind: 'Blocked', tone: 'red' })),
+      ...s.tasks.overdue.map((x) => ({ doc: docById(x.key || x.id), kind: 'Overdue', tone: 'red' })),
+      ...s.risks.high.map((x) => ({ doc: docById(x.key || x.id), kind: 'High risk', tone: 'red' })),
+      ...s.stale.map((x) => ({ doc: docById(x.key || x.id), kind: `Stale ${x.age_days}d`, tone: 'yellow' })),
     ].filter((a) => a.doc);
 
     const rank = { urgent: 0, high: 1, medium: 2, low: 3 };
@@ -185,7 +199,7 @@ const VIEWS = {
     return `
       <div class="hero">
         <div>
-          <div class="hero-project">${project ? esc(project.title) : 'Project overview'}</div>
+          <div class="hero-project">${state.workspace ? (project ? esc(project.title) : 'Project overview') : 'All projects'}</div>
           <div class="hero-headline">
             <span class="status-dot" style="background:${health.color}"></span>
             <span>${esc(headline)}</span>
@@ -193,6 +207,15 @@ const VIEWS = {
         </div>
         <div class="hero-health" style="color:${health.color};border-color:${health.color}">${health.label}</div>
       </div>
+
+      ${state.projects.length > 1 && !state.workspace ? `<section class="block"><h2>Projects</h2><div class="cards">
+        ${state.projects.map((p) => {
+          const totals = p.summary.totals;
+          const active = p.summary.tasks.by_status.in_progress || 0;
+          const todo = (p.summary.tasks.by_status.todo || 0) + (p.summary.tasks.by_status.backlog || 0);
+          return `<div class="card"><div class="num">${todo + active}</div><div class="label">${esc(p.name)}</div><div class="muted">${totals.tasks} tasks · ${totals.documents} docs · ${active} active</div></div>`;
+        }).join('')}
+      </div></section>` : ''}
 
       ${alerts.length ? `<section class="block"><h2 style="color:var(--red)">Needs attention</h2><div class="list">
         ${alerts.map(alertHtml).join('')}
@@ -209,7 +232,7 @@ const VIEWS = {
         </section>
         <section class="block">
           <h2>Recently updated</h2>
-          <div class="list">${s.recent.slice(0, 6).map((x) => itemHtml(docById(x.id))).join('')}</div>
+          <div class="list">${s.recent.slice(0, 6).map((x) => itemHtml(docById(x.key || x.id))).join('')}</div>
         </section>
       </div>
 
@@ -280,6 +303,21 @@ function render() {
   document.getElementById('updated-at').textContent = at ? `Updated ${at}` : '';
   const fp = document.getElementById('f-priority');
   const ft = document.getElementById('f-tag');
+  const ws = document.getElementById('workspace-select');
+  const picker = document.getElementById('workspace-picker');
+  if (picker) picker.classList.toggle('hidden', state.projects.length <= 1);
+  if (ws) {
+    ws.innerHTML = `<option value="">All projects</option>${state.projects.map((p) =>
+      `<option value="${esc(p.id)}" ${state.workspace === p.id ? 'selected' : ''}>${esc(p.name)}</option>`
+    ).join('')}`;
+    if (!ws.dataset.bound) {
+      ws.dataset.bound = '1';
+      ws.addEventListener('change', (e) => {
+        state.workspace = e.target.value;
+        loadData();
+      });
+    }
+  }
   if (fp) fp.addEventListener('change', (e) => { state.filters.priority = e.target.value; render(); });
   if (ft) ft.addEventListener('change', (e) => { state.filters.tag = e.target.value; render(); });
 }
@@ -302,7 +340,7 @@ async function openDoc(id) {
     return target ? `<a href="#" data-related="${esc(r)}">${esc(target.title)}</a>` : `<span class="muted">${esc(r)} (broken link)</span>`;
   }).join(' · ');
   content.innerHTML = `
-    <div class="muted" style="font-size:12px">${esc(doc.path)}</div>
+    <div class="muted" style="font-size:12px">${doc.workspace_name ? `${esc(doc.workspace_name)} · ` : ''}${esc(doc.path)}</div>
     <h1>${esc(doc.title)}</h1>
     <div class="doc-meta">
       <span class="type-chip" style="color:${type.color}">${type.label}</span>

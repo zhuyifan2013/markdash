@@ -18,7 +18,7 @@ Usage:
   markdash init        Initialize docs/, guides, templates, AGENTS.md
   markdash sync        Scan Markdown, refresh cache and generated index
   markdash validate    Validate frontmatter, links, enums; refreshes cache
-  markdash serve       Start dashboard with live reload (default port 4147)
+  markdash serve       Start dashboard with live reload; auto-merges sibling projects
   markdash build       Emit static dashboard to .markdash/dist
 `);
 }

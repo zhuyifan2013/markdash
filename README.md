@@ -84,8 +84,24 @@ markdash validate
 | `markdash init` | Create `docs/`, guides, templates, and append a Markdash section to `AGENTS.md` |
 | `markdash sync` | Scan Markdown, refresh `.markdash/cache/documents.json` and the generated block in `docs/index.md` |
 | `markdash validate` | Validate frontmatter, enums, duplicate ids, and broken links; refreshes the cache |
-| `markdash serve` | Start the dashboard with file watching and live reload (default port 4147, override with `--port=4200`) |
+| `markdash serve` | Start the dashboard with file watching, live reload, and automatic sibling-project discovery |
 | `markdash build` | Emit a static dashboard (with inlined data) to `.markdash/dist` |
+
+### Multiple projects
+
+When started from a project, `markdash serve` automatically discovers initialized
+Markdash projects in sibling directories. For explicit control, repeatable
+`--project` arguments can add exact roots:
+
+```bash
+markdash serve --project=/path/to/project-a --project=/path/to/project-b
+```
+
+The dashboard can show a combined workspace overview or focus on one project.
+Document IDs remain project-local; workspace mode scopes them for routing so
+duplicate IDs across projects cannot collide.
+When the default port is already taken and no `--port` was supplied, Markdash
+automatically tries the next port up to ten times.
 
 Commands exit with code `2` and print guidance when run outside a Markdash
 project; `validate` exits with code `1` on validation errors.
